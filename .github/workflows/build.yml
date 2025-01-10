@@ -21,3 +21,10 @@ jobs:
     secrets:
       ftb-maven-token: ${{ secrets.FTB_MAVEN_TOKEN }}
       saps-token: ${{ secrets.SAPS_TOKEN }}
+
+    # Add the upload-artifact step at the end of the build job
+    - name: Upload JAR as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ftb-xmod-compat-jar  # Choose a name for the artifact
+        path: build/libs/*.jar    # Path to the JAR file(s)
