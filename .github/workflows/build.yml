@@ -14,15 +14,18 @@ jobs:
   build:
     if: |
       !contains(github.event.head_commit.message, '[ciskip]')
-    uses: FTBTeam/mods-meta/.github/workflows/standard-release.yml@main
-    with:
-      curse-publish-task: ""
-      maven-snapshots: true
-    secrets:
-      ftb-maven-token: ${{ secrets.FTB_MAVEN_TOKEN }}
-      saps-token: ${{ secrets.SAPS_TOKEN }}
+    runs-on: ubuntu-latest # Added a runner, it's required
 
-    # Add the upload-artifact step at the end of the build job
+    steps:
+    - name: Run standard-release
+      uses: FTBTeam/mods-meta/.github/workflows/standard-release.yml@main
+      with:
+        curse-publish-task: ""
+        maven-snapshots: true
+      secrets:
+        ftb-maven-token: ${{ secrets.FTB_MAVEN_TOKEN }}
+        saps-token: ${{ secrets.SAPS_TOKEN }}
+
     - name: Upload JAR as artifact
       uses: actions/upload-artifact@v3
       with:
