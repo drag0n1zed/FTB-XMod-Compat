@@ -12,22 +12,31 @@ on:
 
 jobs:
   build:
-    if: |
-      !contains(github.event.head_commit.message, '[ciskip]')
-    runs-on: ubuntu-latest # Added a runner, it's required
+    if: "!contains(github.event.head_commit.message, '[ciskip]')"
+    uses: FTBTeam/mods-meta/.github/workflows/standard-release.yml@main
+    with:
+      curse-publish-task: ""
+      maven-snapshots: true
+    secrets:
+      ftb-maven-token: ${{ secrets.FTB_MAVEN_TOKEN }}
+      saps-token: ${{ secrets.SAPS_TOKEN }}
 
+    # Add the upload-artifact step at the end of the build job
+  # - name: Upload JAR as artifact #this should be another step in the workflow, not the jobs section
+  #   uses: actions/upload-artifact@v3
+  #   with:
+  #     name: ftb-xmod-compat-jar  # Choose a name for the artifact
+  #     path: build/libs/*.jar    # Path to the JAR file(s)
+
+# separate the upload artifact into its own step
+  upload-artifact:
+    needs: build
+    runs-on: ubuntu-latest
     steps:
-    - name: Run standard-release
-      uses: FTBTeam/mods-meta/.github/workflows/standard-release.yml@main
-      with:
-        curse-publish-task: ""
-        maven-snapshots: true
-      secrets:
-        ftb-maven-token: ${{ secrets.FTB_MAVEN_TOKEN }}
-        saps-token: ${{ secrets.SAPS_TOKEN }}
-
-    - name: Upload JAR as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: ftb-xmod-compat-jar  # Choose a name for the artifact
-        path: build/libs/*.jar    # Path to the JAR file(s)
+      - name: Download built artifacts
+        uses: actions/checkout@v3
+      - name: Upload JAR as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ftb-xmod-compat-jar  # Choose a name for the artifact
+          path: build/libs/*.jar    # Path to the JAR file(s)
